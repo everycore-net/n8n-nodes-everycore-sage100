@@ -21,7 +21,7 @@ export class Sage100 implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Sage 100',
 		name: 'sage100',
-		icon: 'file:sage100.svg',
+		icon: { light: 'file:sage100.svg', dark: 'file:sage100.dark.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
@@ -44,7 +44,7 @@ export class Sage100 implements INodeType {
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
 			},
-			skipSslCertificateValidation: '={{$credentials.allowUnauthorizedCerts}}',
+			skipSslCertificateValidation: '={{$credentials.ignoreSslIssues}}',
 		},
 		properties: [
 			{

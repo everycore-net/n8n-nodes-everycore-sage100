@@ -95,7 +95,7 @@ export const vorgangFields: INodeProperties[] = [
 				name: 'spalten',
 				type: 'string',
 				default: '',
-				description: 'Comma separated list of columns to return',
+				description: 'Comma-separated list of columns to return',
 				routing: { request: { qs: { spalten: '={{$value}}' } } },
 			},
 		],

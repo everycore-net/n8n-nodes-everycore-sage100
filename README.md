@@ -4,7 +4,7 @@ n8n community nodes for the [everycore](https://everycore.net) **Sage 100 Task S
 
 They let an n8n workflow read and write sales documents, transactions and articles in Sage 100 through the Task Service, instead of touching the Sage database or the Sage API directly.
 
-> **Status: 0.1.0, not yet released.** The package has never been built or linted — see [Before the first release](#before-the-first-release).
+> **Status: 0.1.0, not yet released.** Lint and build pass; nothing has been run against a live n8n yet — see [Before the first release](#before-the-first-release).
 
 ## Nodes
 

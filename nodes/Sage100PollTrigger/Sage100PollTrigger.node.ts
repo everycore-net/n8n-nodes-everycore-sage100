@@ -23,7 +23,7 @@ export class Sage100PollTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Sage 100 Poll Trigger',
 		name: 'sage100PollTrigger',
-		icon: 'file:sage100.svg',
+		icon: { light: 'file:sage100.svg', dark: 'file:sage100.dark.svg' },
 		group: ['trigger'],
 		version: 1,
 		subtitle: '={{"New sales documents"}}',
@@ -54,8 +54,7 @@ export class Sage100PollTrigger implements INodeType {
 				type: 'number',
 				default: 100,
 				typeOptions: { minValue: 1, maxValue: 500 },
-				description:
-					'How many documents to read per poll. Raise it if more documents can appear between two polls than fit in one batch',
+				description: 'How many documents to read per poll. Raise it if more documents can appear between two polls than fit in one batch.',
 			},
 			{
 				displayName: 'Filters',
@@ -87,6 +86,7 @@ export class Sage100PollTrigger implements INodeType {
 				],
 			},
 		],
+		usableAsTool: true,
 	};
 
 	async poll(this: IPollFunctions): Promise<INodeExecutionData[][] | null> {
@@ -116,7 +116,7 @@ export class Sage100PollTrigger implements INodeType {
 					url: '/api/belege/list',
 					qs,
 					json: true,
-					skipSslCertificateValidation: credentials.allowUnauthorizedCerts as boolean,
+					skipSslCertificateValidation: credentials.ignoreSslIssues as boolean,
 				},
 			)) as IDataObject;
 		} catch (error) {

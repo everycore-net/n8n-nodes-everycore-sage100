@@ -16,6 +16,10 @@ import type {
  * The key is sent in the Authorization header only. The service rejects keys
  * that arrive in the query string, because URLs end up in server, proxy and
  * browser logs while a key stays valid until it is revoked.
+ *
+ * The webhook secret at the bottom belongs to the opposite direction: the key
+ * says who may call the service, the secret proves that an incoming webhook
+ * really came from it. Only the trigger node uses it.
  */
 export class Sage100TaskServiceApi implements ICredentialType {
 	name = 'sage100TaskServiceApi';
@@ -23,6 +27,8 @@ export class Sage100TaskServiceApi implements ICredentialType {
 	displayName = 'Sage 100 Task Service API';
 
 	documentationUrl = 'https://everycore.net';
+
+	icon = { light: 'file:sage100.svg', dark: 'file:sage100.dark.svg' } as const;
 
 	properties: INodeProperties[] = [
 		{
@@ -57,11 +63,28 @@ export class Sage100TaskServiceApi implements ICredentialType {
 		},
 		{
 			displayName: 'Ignore SSL Issues',
-			name: 'allowUnauthorizedCerts',
+			name: 'ignoreSslIssues',
 			type: 'boolean',
 			default: false,
 			description:
 				'Whether to accept an untrusted certificate. Only for the certificate shipped with Sage, which is valid on the intranet but not trusted by the certificate store.',
+		},
+		{
+			displayName: 'Webhook Secret',
+			name: 'webhookSecret',
+			type: 'string',
+			typeOptions: { password: true },
+			default: '',
+			description:
+				'Shared secret of the webhook channel, used by the trigger node to verify incoming events. Leave empty if you do not use the trigger.',
+		},
+		{
+			displayName: 'Webhook Signature Header',
+			name: 'webhookSignatureHeader',
+			type: 'string',
+			default: 'X-EVC-Signature',
+			description:
+				'Header carrying the signature. Change it only if the channel sets SignatureHeader to something else.',
 		},
 	];
 
@@ -88,7 +111,7 @@ export class Sage100TaskServiceApi implements ICredentialType {
 		request: {
 			baseURL: '={{$credentials.baseUrl}}',
 			url: '/api/status',
-			skipSslCertificateValidation: '={{$credentials.allowUnauthorizedCerts}}',
+			skipSslCertificateValidation: '={{$credentials.ignoreSslIssues}}',
 		},
 	};
 }

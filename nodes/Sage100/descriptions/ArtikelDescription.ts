@@ -12,13 +12,6 @@ export const artikelOperations: INodeProperties[] = [
 		default: 'getAll',
 		options: [
 			{
-				name: 'Get Many',
-				value: 'getAll',
-				action: 'Get many articles',
-				description: 'List articles with the filters of the article view',
-				routing: { request: { method: 'GET', url: '/api/artikel/list' } },
-			},
-			{
 				name: 'Get',
 				value: 'get',
 				action: 'Get an article',
@@ -26,11 +19,11 @@ export const artikelOperations: INodeProperties[] = [
 				routing: { request: { method: 'GET', url: '/api/artikel/detail' } },
 			},
 			{
-				name: 'Search',
-				value: 'search',
-				action: 'Search articles',
-				description: 'Type-ahead search over number, match code and description of active articles',
-				routing: { request: { method: 'GET', url: '/api/belege/artikelsuche' } },
+				name: 'Get Many',
+				value: 'getAll',
+				action: 'Get many articles',
+				description: 'List articles with the filters of the article view',
+				routing: { request: { method: 'GET', url: '/api/artikel/list' } },
 			},
 			{
 				name: 'Get Variants',
@@ -40,10 +33,17 @@ export const artikelOperations: INodeProperties[] = [
 				routing: { request: { method: 'GET', url: '/api/belege/auspraegungen' } },
 			},
 			{
+				name: 'Search',
+				value: 'search',
+				action: 'Search articles',
+				description: 'Type-ahead search over number, match code and description of active articles',
+				routing: { request: { method: 'GET', url: '/api/belege/artikelsuche' } },
+			},
+			{
 				name: 'Update',
 				value: 'update',
 				action: 'Update an article',
-				description: 'Change master data fields. Needs the EditStammdaten permission',
+				description: 'Change master data fields. Needs the EditStammdaten permission.',
 				routing: { request: { method: 'POST', url: '/api/artikel/aendern' } },
 			},
 		],
@@ -96,8 +96,7 @@ export const artikelFields: INodeProperties[] = [
 		required: true,
 		default: '{}',
 		placeholder: '{ "Matchcode": "SHIRT-RED", "Gewicht": 0.35 }',
-		description:
-			'Object of column name to value. Only fields the service exposes as editable are accepted',
+		description: 'Object of column name to value. Only fields the service exposes as editable are accepted.',
 		displayOptions: { show: { ...show, operation: ['update'] } },
 		routing: { request: { body: { werte: '={{ JSON.parse($value) }}' } } },
 	},
@@ -147,7 +146,7 @@ export const artikelFields: INodeProperties[] = [
 				name: 'spalten',
 				type: 'string',
 				default: '',
-				description: 'Comma separated list of columns to return',
+				description: 'Comma-separated list of columns to return',
 				routing: { request: { qs: { spalten: '={{$value}}' } } },
 			},
 		],

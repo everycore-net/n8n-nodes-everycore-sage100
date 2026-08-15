@@ -39,8 +39,7 @@
     "n8nNodesApiVersion": 1,
     "strict": true,
     "credentials": [
-      "dist/credentials/Sage100TaskServiceApi.credentials.js",
-      "dist/credentials/Sage100WebhookApi.credentials.js"
+      "dist/credentials/Sage100TaskServiceApi.credentials.js"
     ],
     "nodes": [
       "dist/nodes/Sage100/Sage100.node.js",
