@@ -1,0 +1,61 @@
+{
+  "name": "n8n-nodes-everycore-sage100",
+  "version": "0.1.0",
+  "description": "n8n nodes for the everycore Sage 100 Task Service REST API: sales documents, transactions and articles",
+  "keywords": [
+    "n8n-community-node-package",
+    "sage",
+    "sage100",
+    "erp",
+    "everycore"
+  ],
+  "license": "MIT",
+  "homepage": "https://everycore.net",
+  "author": {
+    "name": "everycore",
+    "email": "info@everycore.net",
+    "url": "https://everycore.net"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://everycore@dev.azure.com/everycore/Sage/_git/n8n-nodes-everycore-sage100"
+  },
+  "engines": {
+    "node": ">=20.15"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "n8n-node build",
+    "dev": "n8n-node dev",
+    "lint": "n8n-node lint",
+    "lint:fix": "n8n-node lint --fix",
+    "release": "n8n-node release",
+    "prepublishOnly": "n8n-node prerelease"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "strict": true,
+    "credentials": [
+      "dist/credentials/Sage100TaskServiceApi.credentials.js",
+      "dist/credentials/Sage100WebhookApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Sage100/Sage100.node.js",
+      "dist/nodes/Sage100Trigger/Sage100Trigger.node.js",
+      "dist/nodes/Sage100PollTrigger/Sage100PollTrigger.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@n8n/node-cli": "latest",
+    "eslint": "9.39.4",
+    "prettier": "3.8.3",
+    "release-it": "20.2.0",
+    "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}

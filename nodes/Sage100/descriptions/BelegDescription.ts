@@ -1,0 +1,516 @@
+import type { INodeProperties } from 'n8n-workflow';
+
+const show = { resource: ['beleg'] };
+
+export const belegOperations: INodeProperties[] = [
+	{
+		displayName: 'Operation',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: { show },
+		default: 'getAll',
+		options: [
+			{
+				name: 'Get Many',
+				value: 'getAll',
+				action: 'Get many sales documents',
+				description: 'List sales documents with the filters of the Belege view',
+				routing: { request: { method: 'GET', url: '/api/belege/list' } },
+			},
+			{
+				name: 'Get Header',
+				value: 'getHeader',
+				action: 'Get the header of a sales document',
+				description: 'Read one document header including its FiBu transfer number',
+				routing: { request: { method: 'GET', url: '/api/belege/kopf' } },
+			},
+			{
+				name: 'Get Positions',
+				value: 'getPositions',
+				action: 'Get the positions of a sales document',
+				description: 'Read all positions of one document',
+				routing: { request: { method: 'GET', url: '/api/belege/positionen' } },
+			},
+			{
+				name: 'Get Open Items',
+				value: 'getOpenItems',
+				action: 'Get the open items of a sales document',
+				description: 'Read the open items belonging to the document',
+				routing: { request: { method: 'GET', url: '/api/belege/offeneposten' } },
+			},
+			{
+				name: 'Get Bookings',
+				value: 'getBookings',
+				action: 'Get the bookings of a sales document',
+				description: 'Read the FiBu bookings created from the document',
+				routing: { request: { method: 'GET', url: '/api/belege/buchungen' } },
+			},
+			{
+				name: 'Check Editable',
+				value: 'checkEditable',
+				action: 'Check whether a sales document may still be changed',
+				description:
+					'Ask whether the document may still be changed and, if not, why. Returns existing follow-up documents and the FiBu state, so an integration can escalate instead of guessing',
+				routing: { request: { method: 'GET', url: '/api/belege/aenderbar' } },
+			},
+			{
+				name: 'Create',
+				value: 'create',
+				action: 'Create a sales document',
+				description: 'Create a new document with at least one position',
+				routing: { request: { method: 'POST', url: '/api/belege/neu' } },
+			},
+			{
+				name: 'Update Header',
+				value: 'updateHeader',
+				action: 'Update the header of a sales document',
+				description: 'Change header fields. Omitted fields stay untouched, empty strings clear a field',
+				routing: { request: { method: 'POST', url: '/api/belege/kopf/aendern' } },
+			},
+			{
+				name: 'Add Position',
+				value: 'addPosition',
+				action: 'Add a position to a sales document',
+				description: 'Append an article position through the Sage document engine',
+				routing: { request: { method: 'POST', url: '/api/belege/position/hinzufuegen' } },
+			},
+			{
+				name: 'Update Position',
+				value: 'updatePosition',
+				action: 'Update a position of a sales document',
+				description: 'Change quantity, unit price or discount of one position',
+				routing: { request: { method: 'POST', url: '/api/belege/position/aendern' } },
+			},
+			{
+				name: 'Delete Position',
+				value: 'deletePosition',
+				action: 'Delete a position of a sales document',
+				description: 'Remove one position from the document',
+				routing: { request: { method: 'POST', url: '/api/belege/position/loeschen' } },
+			},
+			{
+				name: 'Print',
+				value: 'print',
+				action: 'Print a sales document to PDF',
+				description:
+					'Render the document with one of the installed reports and return the PDF as binary data',
+				routing: {
+					request: {
+						method: 'POST',
+						url: '/api/belege/drucken',
+						encoding: 'arraybuffer',
+						json: false,
+					},
+					output: {
+						postReceive: [
+							{
+								type: 'binaryData',
+								properties: { destinationProperty: 'data' },
+							},
+						],
+					},
+				},
+			},
+			{
+				name: 'Get Reports',
+				value: 'getReports',
+				action: 'Get the available print reports',
+				description: 'List the reports this installation actually has, for use with Print',
+				routing: { request: { method: 'GET', url: '/api/belege/reports' } },
+			},
+		],
+	},
+];
+
+export const belegFields: INodeProperties[] = [
+	// ---- identifying one document -------------------------------------------
+	// Two properties for one field on purpose: the reading operations take
+	// belId in the query string, the writing ones in the body. One property
+	// cannot route into both.
+	{
+		displayName: 'Document ID',
+		name: 'belId',
+		type: 'number',
+		required: true,
+		default: 0,
+		description: 'BelID of the document (KHKVKBelege.BelID)',
+		displayOptions: {
+			show: {
+				...show,
+				operation: ['getHeader', 'getPositions', 'getOpenItems', 'getBookings', 'checkEditable'],
+			},
+		},
+		routing: { request: { qs: { belId: '={{$value}}' } } },
+	},
+	{
+		displayName: 'Document ID',
+		name: 'belId',
+		type: 'number',
+		required: true,
+		default: 0,
+		description: 'BelID of the document (KHKVKBelege.BelID)',
+		displayOptions: {
+			show: {
+				...show,
+				operation: ['updateHeader', 'addPosition', 'updatePosition', 'deletePosition', 'print'],
+			},
+		},
+		routing: { request: { body: { belId: '={{$value}}' } } },
+	},
+
+	// ---- get many ------------------------------------------------------------
+	{
+		displayName: 'Return All',
+		name: 'returnAll',
+		type: 'boolean',
+		default: false,
+		description: 'Whether to return all results or only up to a given limit',
+		displayOptions: { show: { ...show, operation: ['getAll'] } },
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		default: 50,
+		typeOptions: { minValue: 1, maxValue: 500 },
+		description: 'Max number of results to return',
+		displayOptions: { show: { ...show, operation: ['getAll'], returnAll: [false] } },
+		routing: { request: { qs: { take: '={{$value}}' } } },
+	},
+	{
+		displayName: 'Filters',
+		name: 'filters',
+		type: 'collection',
+		placeholder: 'Add Filter',
+		default: {},
+		displayOptions: { show: { ...show, operation: ['getAll'] } },
+		options: [
+			{
+				displayName: 'Search',
+				name: 'suche',
+				type: 'string',
+				default: '',
+				description: 'Free text over BelID, document number, customer number, name and match code',
+				routing: { request: { qs: { suche: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Document Type',
+				name: 'belegart',
+				type: 'string',
+				default: '',
+				description: 'Belegart as configured in Sage',
+				routing: { request: { qs: { Belegart: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Document Type Key',
+				name: 'belegkennzeichen',
+				type: 'string',
+				default: '',
+				description: 'Belegkennzeichen, for example VFR for an invoice',
+				routing: { request: { qs: { Belegkennzeichen: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Customer Group',
+				name: 'kundengruppe',
+				type: 'string',
+				default: '',
+				routing: { request: { qs: { Kundengruppe: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Document Date From',
+				name: 'belegdatumVon',
+				type: 'dateTime',
+				default: '',
+				routing: {
+					request: { qs: { BelegdatumVon: '={{ new Date($value).toISOString().substr(0,10) }}' } },
+				},
+			},
+			{
+				displayName: 'Document Date To',
+				name: 'belegdatumBis',
+				type: 'dateTime',
+				default: '',
+				routing: {
+					request: { qs: { BelegdatumBis: '={{ new Date($value).toISOString().substr(0,10) }}' } },
+				},
+			},
+			{
+				displayName: 'Custom Filter (JSON)',
+				name: 'custom',
+				type: 'string',
+				default: '',
+				placeholder: '[{"feld":"Beleg.Referenznummer","wert":"ORD-1001"}]',
+				description:
+					'JSON array of {feld, wert, bis} over any field of the filter catalogue. Use this to look a document up by the reference your own system wrote into it',
+				routing: { request: { qs: { custom: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Columns',
+				name: 'spalten',
+				type: 'string',
+				default: '',
+				placeholder: 'BelID,Belegnummer,Empfaenger',
+				description: 'Comma separated list of columns to return',
+				routing: { request: { qs: { spalten: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Sort By',
+				name: 'sort',
+				type: 'string',
+				default: '',
+				routing: { request: { qs: { sort: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Sort Direction',
+				name: 'dir',
+				type: 'options',
+				default: 'asc',
+				options: [
+					{ name: 'Ascending', value: 'asc' },
+					{ name: 'Descending', value: 'desc' },
+				],
+				routing: { request: { qs: { dir: '={{$value}}' } } },
+			},
+		],
+	},
+
+	// ---- create --------------------------------------------------------------
+	{
+		displayName: 'Document Type Key',
+		name: 'belegkennzeichen',
+		type: 'string',
+		required: true,
+		default: '',
+		placeholder: 'VFR',
+		description: 'Belegkennzeichen of the document to create. Only editable types are accepted',
+		displayOptions: { show: { ...show, operation: ['create'] } },
+		routing: { request: { body: { belegkennzeichen: '={{$value}}' } } },
+	},
+	{
+		displayName: 'Customer Number',
+		name: 'kundennummer',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: { show: { ...show, operation: ['create'] } },
+		routing: { request: { body: { kundennummer: '={{$value}}' } } },
+	},
+	{
+		displayName: 'Document Date',
+		name: 'belegdatum',
+		type: 'dateTime',
+		default: '',
+		description: 'Leave empty for today',
+		displayOptions: { show: { ...show, operation: ['create'] } },
+		routing: { request: { body: { belegdatum: '={{$value}}' } } },
+	},
+	{
+		displayName: 'Positions',
+		name: 'positionen',
+		type: 'fixedCollection',
+		typeOptions: { multipleValues: true },
+		placeholder: 'Add Position',
+		default: {},
+		required: true,
+		description: 'At least one position is required',
+		displayOptions: { show: { ...show, operation: ['create'] } },
+		options: [
+			{
+				displayName: 'Position',
+				name: 'position',
+				values: [
+					{
+						displayName: 'Article Number',
+						name: 'artikelnummer',
+						type: 'string',
+						default: '',
+						required: true,
+					},
+					{
+						displayName: 'Quantity',
+						name: 'menge',
+						type: 'number',
+						default: 1,
+						required: true,
+					},
+					{
+						displayName: 'Variant Handle',
+						name: 'auspraegungsHandle',
+						type: 'number',
+						default: 0,
+						description:
+							'AuspraegungID for variant articles. 0 is the base variant of an ordinary article',
+					},
+					{
+						displayName: 'Unit Price',
+						name: 'einzelpreis',
+						type: 'number',
+						default: 0,
+						description:
+							'Overrides the price found by Sage. Only where the Sage interface would allow it too',
+					},
+				],
+			},
+		],
+		routing: { request: { body: { positionen: '={{ $value.position }}' } } },
+	},
+
+	// ---- update header -------------------------------------------------------
+	{
+		displayName: 'Header Fields',
+		name: 'kopfFelder',
+		type: 'collection',
+		placeholder: 'Add Field',
+		default: {},
+		displayOptions: { show: { ...show, operation: ['updateHeader'] } },
+		options: [
+			{
+				displayName: 'Delivery Date',
+				name: 'liefertermin',
+				type: 'dateTime',
+				default: '',
+				routing: { request: { body: { liefertermin: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Match Code',
+				name: 'matchcode',
+				type: 'string',
+				default: '',
+				routing: { request: { body: { matchcode: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Reference Number',
+				name: 'referenznummer',
+				type: 'string',
+				default: '',
+				description:
+					'Good place for the document number of the calling system: it is filterable and makes an import idempotent',
+				routing: { request: { body: { referenznummer: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Reference Mark',
+				name: 'referenzzeichen',
+				type: 'string',
+				default: '',
+				routing: { request: { body: { referenzzeichen: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Order Reference',
+				name: 'bestellreferenz',
+				type: 'string',
+				default: '',
+				routing: { request: { body: { bestellreferenz: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Header Text',
+				name: 'kopftext',
+				type: 'string',
+				typeOptions: { rows: 3 },
+				default: '',
+				routing: { request: { body: { kopftext: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Footer Text',
+				name: 'fusstext',
+				type: 'string',
+				typeOptions: { rows: 3 },
+				default: '',
+				routing: { request: { body: { fusstext: '={{$value}}' } } },
+			},
+		],
+	},
+
+	// ---- positions -----------------------------------------------------------
+	{
+		displayName: 'Article Number',
+		name: 'artikelnummer',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: { show: { ...show, operation: ['addPosition'] } },
+		routing: { request: { body: { artikelnummer: '={{$value}}' } } },
+	},
+	{
+		displayName: 'Quantity',
+		name: 'menge',
+		type: 'number',
+		required: true,
+		default: 1,
+		displayOptions: { show: { ...show, operation: ['addPosition'] } },
+		routing: { request: { body: { menge: '={{$value}}' } } },
+	},
+	{
+		displayName: 'Variant Handle',
+		name: 'auspraegungsHandle',
+		type: 'number',
+		default: 0,
+		description: 'AuspraegungID for variant articles. 0 is the base variant',
+		displayOptions: { show: { ...show, operation: ['addPosition'] } },
+		routing: { request: { body: { auspraegungsHandle: '={{$value}}' } } },
+	},
+	{
+		displayName: 'Position ID',
+		name: 'belPosId',
+		type: 'number',
+		required: true,
+		default: 0,
+		description: 'BelPosID of the position',
+		displayOptions: { show: { ...show, operation: ['updatePosition', 'deletePosition'] } },
+		routing: { request: { body: { belPosId: '={{$value}}' } } },
+	},
+	{
+		displayName: 'Position Fields',
+		name: 'positionFelder',
+		type: 'collection',
+		placeholder: 'Add Field',
+		default: {},
+		displayOptions: { show: { ...show, operation: ['updatePosition'] } },
+		options: [
+			{
+				displayName: 'Quantity',
+				name: 'menge',
+				type: 'number',
+				default: 1,
+				routing: { request: { body: { menge: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Unit Price',
+				name: 'einzelpreis',
+				type: 'number',
+				default: 0,
+				routing: { request: { body: { einzelpreis: '={{$value}}' } } },
+			},
+			{
+				displayName: 'Discount',
+				name: 'rabatt',
+				type: 'number',
+				default: 0,
+				routing: { request: { body: { rabatt: '={{$value}}' } } },
+			},
+		],
+	},
+
+	// ---- print ---------------------------------------------------------------
+	{
+		displayName: 'Report Name',
+		name: 'berichtName',
+		type: 'string',
+		required: true,
+		default: '',
+		placeholder: 'rptVKRechnung.Sage.Wawi',
+		description:
+			'Name of an installed report. Use Get Reports to list them — an invented name is rejected by the reporting service',
+		displayOptions: { show: { ...show, operation: ['print'] } },
+		routing: { request: { body: { berichtName: '={{$value}}' } } },
+	},
+	{
+		displayName: 'Language',
+		name: 'sprache',
+		type: 'string',
+		default: '',
+		description: 'Report language, empty for the installation default',
+		displayOptions: { show: { ...show, operation: ['print'] } },
+		routing: { request: { body: { sprache: '={{$value}}' } } },
+	},
+];
