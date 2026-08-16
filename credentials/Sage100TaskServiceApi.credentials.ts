@@ -28,7 +28,7 @@ export class Sage100TaskServiceApi implements ICredentialType {
 
 	documentationUrl = 'https://everycore.net';
 
-	icon = { light: 'file:sage100.svg', dark: 'file:sage100.dark.svg' } as const;
+	icon = { light: 'file:everycore.svg', dark: 'file:everycore.dark.svg' } as const;
 
 	properties: INodeProperties[] = [
 		{

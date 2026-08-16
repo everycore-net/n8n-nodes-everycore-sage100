@@ -21,7 +21,7 @@ export class Sage100 implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Sage 100',
 		name: 'sage100',
-		icon: { light: 'file:sage100.svg', dark: 'file:sage100.dark.svg' },
+		icon: { light: 'file:everycore.svg', dark: 'file:everycore.dark.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',

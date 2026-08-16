@@ -98,13 +98,12 @@ Lint and build pass, but **nothing here has been exercised against a running n8n
 - **Print → binary output.** The `binaryData` post-receive action is the least certain construct in the package.
 - **`rawBody` in the webhook trigger.** Signature verification depends on getting the body exactly as it was signed; re-serialised JSON will not match.
 - **Channel lifecycle.** Activate and deactivate a workflow and confirm the channel appears and disappears in *Settings → Communication*.
-- **Icons.** They are hand-drawn placeholders, not an official mark — see the note below.
 
 For n8n's verified registry the package additionally needs a **public** repository, publishing through **GitHub Actions with provenance** (mandatory since 1 May 2026), MIT licence, no runtime dependencies, and an English-only interface. The last three are already met; the `repository` field in `package.json` still points at Azure DevOps and must be changed when the repository moves.
 
-## A note on the icons
+## Icons
 
-`sage100.svg` and `sage100.dark.svg` were drawn for this package. They are **not** Sage's logo and carry no licence from Sage, but the green and the stylised S deliberately evoke Sage's identity, which is a decision to make consciously before publishing anything publicly. Replacing them with an everycore mark, or with a neutral glyph, avoids the question entirely.
+The nodes carry the everycore mark, not Sage's. `everycore.svg` (transparent) is the light-theme variant, `everycore.dark.svg` (on the dark tile) the dark-theme one; n8n rejects a pair that points at the same file. Using our own mark keeps Sage's trade dress out of a package we publish under our own name.
 
 ## Licence
 

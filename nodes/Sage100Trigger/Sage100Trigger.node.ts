@@ -29,7 +29,7 @@ export class Sage100Trigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Sage 100 Trigger',
 		name: 'sage100Trigger',
-		icon: { light: 'file:sage100.svg', dark: 'file:sage100.dark.svg' },
+		icon: { light: 'file:everycore.svg', dark: 'file:everycore.dark.svg' },
 		group: ['trigger'],
 		version: 1,
 		subtitle: '={{$parameter["events"]}}',
