@@ -1,0 +1,22 @@
+{
+  "header": {
+    "displayName": "Sage 100 Trigger",
+    "description": "Startet einen Workflow, wenn der Sage 100 Task Service ein Ereignis sendet"
+  },
+  "nodeView.manageChannel.displayName": "Kanal verwalten",
+  "nodeView.manageChannel.description": "Ob der Webhook-Kanal im Dienst beim Aktivieren des Workflows angelegt und beim Deaktivieren wieder entfernt wird. Erfordert einen API-Schlüssel mit dem Recht Settings. Ausschalten, um einen von Hand eingerichteten Kanal zu verwenden.",
+  "nodeView.manualNotice.displayName": "Die Produktions-Webhook-URL dieses Knotens im Dienst unter Einstellungen -> Kommunikation als WebhookUrl eines Kanals eintragen, mit AuthMode=Hmac und demselben Secret wie in den Zugangsdaten.",
+  "nodeView.zweck.displayName": "Zwecke",
+  "nodeView.zweck.description": "Welche Arten von Nachrichten der Kanal erhalten soll",
+  "nodeView.zweck.options.Allgemein.name": "Allgemein",
+  "nodeView.zweck.options.Ablage.name": "Ablage",
+  "nodeView.zweck.options.Belegversand.name": "Belegversand",
+  "nodeView.zweck.options.Fehler.name": "Fehler",
+  "nodeView.verifySignature.displayName": "Signatur prüfen",
+  "nodeView.verifySignature.description": "Ob die HMAC-Signatur verlangt und geprüft wird. Nur für einen Kanal mit AuthMode=None in einem vertrauenswürdigen Netz ausschalten — einen unsignierten Webhook kann jeder senden, der die URL kennt.",
+  "nodeView.tolerance.displayName": "Toleranz (Sekunden)",
+  "nodeView.tolerance.description": "Wie weit der Zeitstempel einer Anfrage von der aktuellen Zeit abweichen darf. 0 schaltet die Altersprüfung ab und damit auch den Schutz vor Wiedereinspielung.",
+  "nodeView.events.displayName": "Ereignisse",
+  "nodeView.events.description": "Kommagetrennte Liste durchzulassender Ereignisnamen, verglichen mit dem Feld ereignis. Leer lässt jedes Ereignis durch.",
+  "nodeView.events.placeholder": "belegAngelegt,aufgabeFehlgeschlagen"
+}

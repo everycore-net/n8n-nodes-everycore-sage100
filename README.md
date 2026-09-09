@@ -4,7 +4,7 @@ n8n community nodes for the [everycore](https://everycore.net) **Sage 100 Task S
 
 They let an n8n workflow read and write sales documents, transactions and articles in Sage 100 through the Task Service, instead of touching the Sage database or the Sage API directly.
 
-> **Status: 0.1.0, not yet released.** Lint and build pass; nothing has been run against a live n8n yet — see [Before the first release](#before-the-first-release).
+> **Status: 0.1.0, not yet released.** Lint, tests and build pass; nothing has been run against a live n8n yet — see [Before the first release](#before-the-first-release).
 
 ## Nodes
 
@@ -75,6 +75,18 @@ Creating a document is not idempotent — Sage does not deduplicate, and a retri
 
 This is check-then-create, not an atomic operation: two workflows running at the same moment can still both create. For scheduled work that is usually acceptable; for a high-rate stream it is not.
 
+## Language
+
+The interface is English, as n8n requires of a community node. A German instance — one started with `N8N_DEFAULT_LOCALE=de` — gets German labels instead: the package ships translation files, and n8n reads them per node.
+
+The German is the point rather than decoration: the terms a Sage user knows are German, and translating *Beleg* into "sales document" for a German bookkeeper helps nobody. What stays untranslated in both languages is anything typed or matched literally — `BelID`, `Belegkennzeichen`, `KHKVKBelege.BelID`, a report name like `rptVKRechnung.Sage.Wawi`.
+
+```bash
+npm run translations   # refresh the key list from the built nodes
+```
+
+The generator never overwrites a translated value; it adds keys the nodes have grown and reports what is still English. Two things about the mechanism are worth knowing before touching it. The file name is the **whole node type**, package included — `n8n-nodes-everycore-sage100.sage100.json` — because n8n strips only its own `n8n-nodes-base.` prefix. And `n8n-node build` copies only images and `__schema__`, so `tools/copy-translations.mjs` puts the files into `dist`; without it everything builds, publishes and installs, and a German instance silently shows English.
+
 ## Licensing
 
 Every person who works with Sage 100 data needs a valid Sage licence, whatever the technical route. The service logs into Sage locally through the Mandant object, which is a **3rd-Party Connector**, and machine-to-machine access without an identifiable person is licensed **per customer**. An n8n workflow does not change that — settle it before going live.
@@ -84,7 +96,8 @@ Every person who works with Sage 100 data needs a valid Sage licence, whatever t
 ```bash
 npm install
 npm run lint         # clean
-npm run build        # TypeScript builds, dist is ~143 KB
+npm test             # 11 tests around the poll trigger's watermark
+npm run build        # TypeScript builds, then copies the translations
 npm run dev          # starts n8n with the nodes loaded
 npx @n8n/scan-community-package n8n-nodes-everycore-sage100
 ```

@@ -1,0 +1,14 @@
+{
+  "header": {
+    "displayName": "Sage 100 Poll Trigger",
+    "description": "Startet einen Workflow für Belege, die seit dem letzten Lauf hinzugekommen sind"
+  },
+  "nodeView.behaviourNotice.displayName": "Löst für Belege aus, deren BelID höher ist als die höchste bisher gesehene. Änderungen an bestehenden Belegen lösen nicht aus — dafür ist der Webhook-Trigger da.",
+  "nodeView.batchSize.displayName": "Stapelgröße",
+  "nodeView.batchSize.description": "Wie viele Belege je Abfrage gelesen werden. Erhöhen, wenn zwischen zwei Abfragen mehr Belege entstehen können, als in einen Stapel passen.",
+  "nodeView.filters.displayName": "Filter",
+  "nodeView.filters.placeholder": "Filter hinzufügen",
+  "nodeView.filters.options.belegkennzeichen.displayName": "Belegkennzeichen",
+  "nodeView.filters.options.kundengruppe.displayName": "Kundengruppe",
+  "nodeView.filters.options.custom.displayName": "Eigener Filter (JSON)"
+}
