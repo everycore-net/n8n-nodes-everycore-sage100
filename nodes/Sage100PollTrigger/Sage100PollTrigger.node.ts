@@ -68,7 +68,7 @@ export class Sage100PollTrigger implements INodeType {
 						name: 'belegkennzeichen',
 						type: 'string',
 						default: '',
-						description: 'Only documents with this Belegkennzeichen, for example VFR',
+						description: 'Only documents with this type code (Belegkennzeichen), for example VFR',
 					},
 					{
 						displayName: 'Customer Group',
@@ -86,7 +86,6 @@ export class Sage100PollTrigger implements INodeType {
 				],
 			},
 		],
-		usableAsTool: true,
 	};
 
 	async poll(this: IPollFunctions): Promise<INodeExecutionData[][] | null> {
@@ -146,6 +145,22 @@ export class Sage100PollTrigger implements INodeType {
 
 		const fresh = rows.filter((row) => (Number(row.belId) || 0) > seen);
 		if (fresh.length === 0) return null;
+
+		// A full batch in which nothing is known means the window was too small:
+		// documents older than the last row exist, are newer than the watermark,
+		// and are about to be skipped for good, because the watermark jumps to the
+		// highest BelID either way. Losing sales documents quietly is worse than
+		// failing loudly, so this stops instead.
+		if (fresh.length === rows.length && rows.length >= batchSize) {
+			throw new NodeOperationError(
+				this.getNode(),
+				`More than ${batchSize} new sales documents since the last poll`,
+				{
+					description:
+						'Every document in the batch is new, so older ones exist that this poll cannot see. Raise Batch Size or poll more often, then reactivate the workflow. The watermark has not been moved, so nothing is lost yet.',
+				},
+			);
+		}
 
 		staticData.lastBelId = highest;
 

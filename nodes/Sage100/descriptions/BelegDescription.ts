@@ -57,7 +57,7 @@ export const belegOperations: INodeProperties[] = [
 				name: 'Get Many',
 				value: 'getAll',
 				action: 'Get many sales documents',
-				description: 'List sales documents with the filters of the Belege view',
+				description: 'List sales documents with the filters of the document view',
 				routing: { request: { method: 'GET', url: '/api/belege/list' } },
 			},
 			{
@@ -233,7 +233,7 @@ export const belegFields: INodeProperties[] = [
 				name: 'belegart',
 				type: 'string',
 				default: '',
-				description: 'Belegart as configured in Sage',
+				description: 'Document type (Belegart) as configured in Sage',
 				routing: { request: { qs: { Belegart: '={{$value}}' } } },
 			},
 			{
@@ -241,7 +241,7 @@ export const belegFields: INodeProperties[] = [
 				name: 'belegkennzeichen',
 				type: 'string',
 				default: '',
-				description: 'Belegkennzeichen, for example VFR for an invoice',
+				description: 'Document type code (Belegkennzeichen), for example VFR for an invoice',
 				routing: { request: { qs: { Belegkennzeichen: '={{$value}}' } } },
 			},
 			{
@@ -281,7 +281,7 @@ export const belegFields: INodeProperties[] = [
 		required: true,
 		default: '',
 		placeholder: 'VFR',
-		description: 'Belegkennzeichen of the document to create. Only editable types are accepted.',
+		description: 'Document type code (Belegkennzeichen) of the document to create. Only editable types are accepted.',
 		displayOptions: { show: { ...show, operation: ['create'] } },
 		routing: { request: { body: { belegkennzeichen: '={{$value}}' } } },
 	},

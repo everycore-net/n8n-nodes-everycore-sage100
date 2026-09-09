@@ -43,7 +43,7 @@ export const artikelOperations: INodeProperties[] = [
 				name: 'Update',
 				value: 'update',
 				action: 'Update an article',
-				description: 'Change master data fields. Needs the EditStammdaten permission.',
+				description: 'Change master data fields. Needs the EditStammdaten permission in Sage.',
 				routing: { request: { method: 'POST', url: '/api/artikel/aendern' } },
 			},
 		],

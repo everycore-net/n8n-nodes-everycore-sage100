@@ -37,7 +37,6 @@ export class Sage100Trigger implements INodeType {
 		defaults: {
 			name: 'Sage 100 Trigger',
 		},
-		usableAsTool: true,
 		inputs: [],
 		outputs: [NodeConnectionTypes.Main],
 		credentials: [

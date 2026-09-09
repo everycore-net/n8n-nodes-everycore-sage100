@@ -57,17 +57,17 @@ export class Sage100 implements INodeType {
 					{
 						name: 'Sales Document',
 						value: 'beleg',
-						description: 'Belege: read, create, change, print and check',
+						description: 'Sales documents: read, create, change, print and check',
 					},
 					{
 						name: 'Sales Transaction',
 						value: 'vorgang',
-						description: 'Vorgänge: read only',
+						description: 'Sales transactions: read only',
 					},
 					{
 						name: 'Article',
 						value: 'artikel',
-						description: 'Artikel: read, search and change master data',
+						description: 'Articles: read, search and change master data',
 					},
 				],
 			},
