@@ -113,6 +113,6 @@
   "nodeView.take.displayName": "Limit",
   "nodeView.take.description": "Maximale Anzahl zurückgegebener Ergebnisse",
   "nodeView.werte.displayName": "Werte",
-  "nodeView.werte.description": "Objekt aus Spaltenname und Wert. Angenommen werden nur Felder, die der Dienst als änderbar ausweist.",
+  "nodeView.werte.description": "Objekt aus Spaltenname und Wert. Angenommen werden die beschreibbaren Felder des Sage-Artikelstamms und USER_-Benutzerfelder; Artikelnummer und Mandant werden als Schlüsselfelder abgelehnt. Ein unbekannter Name wird namentlich abgelehnt — ein Tippfehler geht also nicht still durch.",
   "nodeView.werte.placeholder": "{ \"Matchcode\": \"SHIRT-RED\", \"Gewicht\": 0.35 }"
 }

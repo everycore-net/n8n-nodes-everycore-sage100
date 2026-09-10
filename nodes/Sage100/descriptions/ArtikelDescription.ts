@@ -99,7 +99,7 @@ export const artikelFields: INodeProperties[] = [
 		required: true,
 		default: '{}',
 		placeholder: '{ "Matchcode": "SHIRT-RED", "Gewicht": 0.35 }',
-		description: 'Object of column name to value. Only fields the service exposes as editable are accepted.',
+		description: 'Object of column name to value. Accepted are the writable fields of the Sage article record and USER_ custom fields; Artikelnummer and Mandant are refused as key fields. An unknown name is refused by name, so a typo does not pass silently.',
 		displayOptions: { show: { ...show, operation: ['update'] } },
 		routing: { request: { body: { werte: '={{ JSON.parse($value) }}' } } },
 	},

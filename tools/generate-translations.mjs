@@ -14,6 +14,11 @@
  * point being that a new parameter cannot slip into a German instance in English
  * without somebody being told.
  *
+ * What it cannot see: an English text that changed while its key stayed. The
+ * German then quietly describes the previous behaviour, which is worse than an
+ * untranslated string because nothing looks wrong. Reword an existing
+ * description and the translation has to be reworded by hand.
+ *
  *   npm run translations
  */
 import { mkdirSync, readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
