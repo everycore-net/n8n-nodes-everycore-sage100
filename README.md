@@ -122,12 +122,14 @@ The service keeps its envelope for everyone — the Core web interface pages thr
 
 Checked on 10 September 2026 against n8n 2.35.5 and a live Task Service (Mandant 123) with `tools/live-n8n-check.mjs`: credential test, all three Get Many operations, Get Positions, Get Bookings, Get Open Items, Search and Get Reports — each delivering the shape above. The script creates its own API key, credential and workflow and removes all three afterwards.
 
-Still unproven, because none of it is read-only or observable from a script:
+The writing operations were run against Mandant 123 on the same day, through two workflows on the working n8n: create a document, add a position, change the header, change a position, delete it, read the result — and print, which came back as a 162 kB PDF and set `gedruckt` on the document in Sage. Two answers do not contain what a workflow needs next, and both are now said in the operation's own description: **Create answers with `newBelId`**, not `belId`, and **Add Position answers with counts and totals but no `belPosId`**, so the position has to be read back before it can be changed or deleted.
 
-- **Print → binary output.** The `binaryData` post-receive action is the least certain construct in the package.
+Still unproven:
+
 - **`rawBody` in the webhook trigger.** Signature verification depends on getting the body exactly as it was signed; re-serialised JSON will not match.
 - **Channel lifecycle.** Activate and deactivate a workflow and confirm the channel appears and disappears in *Settings → Communication*.
-- **The writing operations** — Create, Add/Update/Delete Position, Update Header — have not been run against a live Mandant.
+
+And one gap rather than a doubt: the service can delete a document (`/api/belege/loeschen`) but the node has no operation for it. A workflow can create documents and cannot clean up after itself.
 
 For n8n's verified registry the package needs a **public** repository, publishing through **GitHub Actions with provenance** (mandatory since 1 May 2026), MIT licence, no runtime dependencies, and an English-only interface. All of those are met.
 

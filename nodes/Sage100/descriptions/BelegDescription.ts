@@ -15,7 +15,7 @@ export const belegOperations: INodeProperties[] = [
 				name: 'Add Position',
 				value: 'addPosition',
 				action: 'Add a position to a sales document',
-				description: 'Append an article position through the Sage document engine',
+				description: 'Append an article position through the Sage document engine. Answers with counts and totals but no belPosId — read the positions back to find the new one.',
 				routing: { request: { method: 'POST', url: '/api/belege/position/hinzufuegen' } },
 			},
 			{
@@ -29,7 +29,7 @@ export const belegOperations: INodeProperties[] = [
 				name: 'Create',
 				value: 'create',
 				action: 'Create a sales document',
-				description: 'Create a new document with at least one position',
+				description: 'Create a new document with at least one position. The answer carries newBelId, not belId, which is what a following node has to read.',
 				routing: { request: { method: 'POST', url: '/api/belege/neu' } },
 			},
 			{
