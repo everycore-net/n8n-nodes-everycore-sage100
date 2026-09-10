@@ -16,7 +16,7 @@ They let an n8n workflow read and write sales documents, transactions and articl
 
 ### Sage 100 — operations
 
-**Sales Document** — Add Position, **Check Editable**, Create, Delete Position, Get Bookings, Get Header, Get Many, Get Open Items, Get Positions, Get Reports, Print (PDF), Update Header, Update Position
+**Sales Document** — Add Position, **Check Editable**, Create, Delete, Delete Position, Get Bookings, Get Header, Get Many, Get Open Items, Get Positions, Get Reports, Print (PDF), Update Header, Update Position
 
 **Sales Transaction** — Get Many, Get, Get Positions
 
@@ -129,7 +129,7 @@ Still unproven:
 - **`rawBody` in the webhook trigger.** Signature verification depends on getting the body exactly as it was signed; re-serialised JSON will not match.
 - **Channel lifecycle.** Activate and deactivate a workflow and confirm the channel appears and disappears in *Settings → Communication*.
 
-And one gap rather than a doubt: the service can delete a document (`/api/belege/loeschen`) but the node has no operation for it. A workflow can create documents and cannot clean up after itself.
+
 
 For n8n's verified registry the package needs a **public** repository, publishing through **GitHub Actions with provenance** (mandatory since 1 May 2026), MIT licence, no runtime dependencies, and an English-only interface. All of those are met.
 

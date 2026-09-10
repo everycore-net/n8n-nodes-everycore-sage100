@@ -17,6 +17,8 @@
   "nodeView.operation.options.checkEditable.description": "Fragt, ob der Beleg noch geändert werden darf, und wenn nicht, warum. Liefert vorhandene Folgebelege und den FiBu-Stand, damit eine Integration eskalieren kann, statt zu raten.",
   "nodeView.operation.options.create.name": "Anlegen",
   "nodeView.operation.options.create.description": "Einen neuen Beleg mit mindestens einer Position anlegen",
+  "nodeView.operation.options.delete.name": "Löschen",
+  "nodeView.operation.options.delete.description": "Den ganzen Beleg löschen. Wird abgelehnt, sobald ein Folgebeleg existiert oder der Beleg in die FiBu übergeben wurde — vorher „Änderbarkeit prüfen\" aufrufen, wenn der Workflow diesen Fall behandeln muss.",
   "nodeView.operation.options.deletePosition.name": "Position löschen",
   "nodeView.operation.options.deletePosition.description": "Eine Position aus dem Beleg entfernen",
   "nodeView.operation.options.getBookings.name": "Buchungen lesen",

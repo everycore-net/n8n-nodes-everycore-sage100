@@ -33,6 +33,13 @@ export const belegOperations: INodeProperties[] = [
 				routing: { request: { method: 'POST', url: '/api/belege/neu' } },
 			},
 			{
+				name: 'Delete',
+				value: 'delete',
+				action: 'Delete a sales document',
+				description: 'Delete the whole document. Refused once it has a follow-up document or went to the FiBu — ask Check Editable first if that is a case the workflow has to handle.',
+				routing: { request: { method: 'POST', url: '/api/belege/loeschen' } },
+			},
+			{
 				name: 'Delete Position',
 				value: 'deletePosition',
 				action: 'Delete a position of a sales document',
@@ -158,7 +165,7 @@ export const belegFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				...show,
-				operation: ['updateHeader', 'addPosition', 'updatePosition', 'deletePosition', 'print'],
+				operation: ['updateHeader', 'addPosition', 'updatePosition', 'deletePosition', 'delete', 'print'],
 			},
 		},
 		routing: { request: { body: { belId: '={{$value}}' } } },
