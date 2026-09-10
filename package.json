@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-everycore-sage100",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "n8n nodes for everycore Core for Sage 100: sales documents, transactions and articles",
   "keywords": [
     "n8n-community-node-package",

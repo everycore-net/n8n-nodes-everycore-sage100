@@ -4,7 +4,7 @@ n8n community nodes for **[everycore Core](https://everycore.net) for Sage 100**
 
 They let an n8n workflow read and write sales documents, transactions and articles in Sage 100 through Core, instead of touching the Sage database or the Sage API directly.
 
-> **Status: 0.1.0, published.** Every operation of all three nodes has been run against a live n8n and a live Core installation — see [What was verified](#what-was-verified).
+> **Status: 0.1.1, published.** Every operation of all three nodes has been run against a live n8n and a live Core installation — see [What was verified](#what-was-verified).
 
 ## Nodes
 
