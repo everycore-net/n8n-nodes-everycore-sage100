@@ -4,7 +4,7 @@ n8n community nodes for the [everycore](https://everycore.net) **Sage 100 Task S
 
 They let an n8n workflow read and write sales documents, transactions and articles in Sage 100 through the Task Service, instead of touching the Sage database or the Sage API directly.
 
-> **Status: 0.1.0, not yet released.** Lint, tests and build pass, and the reading operations have been exercised against a live n8n and a live Task Service — see [Before the first release](#before-the-first-release) for what is still open.
+> **Status: 0.1.0, not yet released.** Lint, tests and build pass, and every operation of all three nodes has been run against a live n8n and a live Task Service — see [Before the first release](#before-the-first-release).
 
 ## Nodes
 
@@ -138,7 +138,9 @@ The signature check was then attacked rather than demonstrated, because a trigge
 
 Four refusals and one acceptance — so `rawBody` reaches the node unmodified, and the age check does its half of the work. Worth knowing when reading the executions list afterwards: n8n records a refused delivery as an execution with status *error*, so the count alone says nothing. The HTTP status is what distinguishes them.
 
+`Artikel → Update` went last, since it writes master data: a field was read, changed through the node, read back, and the original value written back through the node again, so both directions are proven and the article ends where it started. The service accepts the writable fields of the Sage article record and `USER_` custom fields; `Artikelnummer` and `Mandant` are refused as key fields, and an unknown name is refused by name rather than ignored.
 
+With that, every operation of all three nodes has been run against a live Mandant.
 
 For n8n's verified registry the package needs a **public** repository, publishing through **GitHub Actions with provenance** (mandatory since 1 May 2026), MIT licence, no runtime dependencies, and an English-only interface. All of those are met.
 
