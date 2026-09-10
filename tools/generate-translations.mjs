@@ -19,6 +19,18 @@
  * untranslated string because nothing looks wrong. Reword an existing
  * description and the translation has to be reworded by hand.
  *
+ * What it does now report is the other trap, which is worse because it cannot
+ * be fixed by translating more carefully. n8n builds an option's key from the
+ * *parameter name* and the *option value* only - `operation` + `get` - and every
+ * resource declares its own `operation` property. So one key carries the text of
+ * every resource that has that operation, and whatever German is written there
+ * is shown for all of them. English does not have this problem: with no
+ * translation n8n uses each property's own text, so the collapse only appears
+ * once the locale is switched.
+ *
+ * Such keys must therefore be worded so that they are true for every resource
+ * that shares them, or left untranslated. They are listed at the end of a run.
+ *
  *   npm run translations
  */
 import { mkdirSync, readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
@@ -64,6 +76,7 @@ if (!existsSync(nodesDir)) {
 }
 
 let missingTotal = 0;
+let sharedTotal = 0;
 
 for (const dir of readdirSync(nodesDir)) {
 	const entry = readdirSync(join(nodesDir, dir)).find((file) => file.endsWith('.node.js'));
@@ -73,7 +86,18 @@ for (const dir of readdirSync(nodesDir)) {
 	const NodeClass = Object.values(module).find((value) => typeof value === 'function');
 	const description = new NodeClass().description;
 
-	const wanted = new Map(keysOf(description.properties));
+	const emitted = keysOf(description.properties);
+	const wanted = new Map(emitted);
+
+	// One key, several English texts: the resources share it and only one German
+	// can be stored. Reported, not repaired - see the header.
+	const texts = new Map();
+	for (const [key, english] of emitted) {
+		if (!texts.has(key)) texts.set(key, new Set());
+		texts.get(key).add(english);
+	}
+	const shared = [...texts].filter(([, values]) => values.size > 1);
+
 	const target = join(root, 'nodes', dir, 'translations', LOCALE, `${packageName}.${description.name}.json`);
 
 	const existing = existsSync(target) ? JSON.parse(readFileSync(target, 'utf8')) : {};
@@ -99,11 +123,23 @@ for (const dir of readdirSync(nodesDir)) {
 
 	const dropped = Object.keys(existing).filter((key) => key !== 'header' && !wanted.has(key));
 	missingTotal += missing.length;
+	sharedTotal += shared.length;
 	console.log(
-		`${description.name}: ${wanted.size} keys, ${missing.length} still English, ${dropped.length} dropped -> ${target.slice(root.length)}`,
+		`${description.name}: ${wanted.size} keys, ${missing.length} still English, ${dropped.length} dropped, ${shared.length} shared -> ${target.slice(root.length)}`,
 	);
+	for (const [key, values] of shared) {
+		console.log(`   shared: ${key} carries ${values.size} English texts`);
+		for (const value of values) console.log(`      ${value}`);
+	}
 }
 
 if (missingTotal > 0) {
 	console.log(`\n${missingTotal} keys carry their English text. Translate them in place; the generator keeps whatever it finds.`);
+}
+
+if (sharedTotal > 0) {
+	console.log(
+		`\n${sharedTotal} key(s) are shared by several resources. The German stored there is shown for all of them, ` +
+			'so it has to be true for all of them: name every case or word it neutrally.',
+	);
 }

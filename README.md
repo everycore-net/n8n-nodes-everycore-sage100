@@ -85,7 +85,11 @@ The German is the point rather than decoration: the terms a Sage user knows are 
 npm run translations   # refresh the key list from the built nodes
 ```
 
-The generator never overwrites a translated value; it adds keys the nodes have grown and reports what is still English. Two things about the mechanism are worth knowing before touching it. The file name is the **whole node type**, package included — `n8n-nodes-everycore-sage100.sage100.json` — because n8n strips only its own `n8n-nodes-base.` prefix. And `n8n-node build` copies only images and `__schema__`, so `tools/copy-translations.mjs` puts the files into `dist`; without it everything builds, publishes and installs, and a German instance silently shows English.
+The generator never overwrites a translated value; it adds keys the nodes have grown and reports what is still English. Three things about the mechanism are worth knowing before touching it.
+
+The file name is the **whole node type**, package included — `n8n-nodes-everycore-sage100.sage100.json` — because n8n strips only its own `n8n-nodes-base.` prefix. `n8n-node build` copies only images and `__schema__`, so `tools/copy-translations.mjs` puts the files into `dist`; without it everything builds, publishes and installs, and a German instance silently shows English.
+
+And **some keys are shared by several resources**. n8n keys an option by parameter name and option value alone — `operation` plus `get` — while each resource declares its own `operation` property, so one entry carries the text of all of them and the German written there is shown for every one. English does not show this: with no translation n8n uses each property's own text. The generator lists such keys at the end of a run; their German has to be true for every resource that shares it. `npm test` checks that the files and the node descriptions have not drifted apart — a missing key falls back to English and a stale one is ignored, so neither fails anywhere else.
 
 ## Licensing
 
