@@ -124,10 +124,19 @@ Checked on 10 September 2026 against n8n 2.35.5 and a live Task Service (Mandant
 
 The writing operations were run against Mandant 123 on the same day, through two workflows on the working n8n: create a document, add a position, change the header, change a position, delete it, read the result — and print, which came back as a 162 kB PDF and set `gedruckt` on the document in Sage. Two answers do not contain what a workflow needs next, and both are now said in the operation's own description: **Create answers with `newBelId`**, not `belId`, and **Add Position answers with counts and totals but no `belPosId`**, so the position has to be read back before it can be changed or deleted.
 
-Still unproven:
+The webhook trigger was run against the same service. Activating the workflow created the channel (`n8n-<workflow>-Sage-100-Trigger`, type Webhook, enabled), a test message from *Communication → Test* arrived and ran the workflow, and deactivating removed the channel again.
 
-- **`rawBody` in the webhook trigger.** Signature verification depends on getting the body exactly as it was signed; re-serialised JSON will not match.
-- **Channel lifecycle.** Activate and deactivate a workflow and confirm the channel appears and disappears in *Settings → Communication*.
+The signature check was then attacked rather than demonstrated, because a trigger that accepts a valid signature looks exactly like one that accepts everything:
+
+| Request | Answer |
+|---|---|
+| no signature at all | 500, refused |
+| signature of the wrong secret | 500, refused |
+| valid signature over a different body | 500, refused |
+| valid signature, timestamp an hour old | 500, refused |
+| valid signature, current timestamp | **200, accepted** |
+
+Four refusals and one acceptance — so `rawBody` reaches the node unmodified, and the age check does its half of the work. Worth knowing when reading the executions list afterwards: n8n records a refused delivery as an execution with status *error*, so the count alone says nothing. The HTTP status is what distinguishes them.
 
 
 
