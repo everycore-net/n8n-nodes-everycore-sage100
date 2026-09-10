@@ -58,7 +58,10 @@ export const belegOperations: INodeProperties[] = [
 				value: 'getAll',
 				action: 'Get many sales documents',
 				description: 'List sales documents with the filters of the document view',
-				routing: { request: { method: 'GET', url: '/api/belege/list' } },
+				routing: {
+					request: { method: 'GET', url: '/api/belege/list' },
+					output: { postReceive: [{ type: 'rootProperty', properties: { property: 'rows' } }] },
+				},
 			},
 			{
 				name: 'Get Open Items',
@@ -72,7 +75,10 @@ export const belegOperations: INodeProperties[] = [
 				value: 'getPositions',
 				action: 'Get the positions of a sales document',
 				description: 'Read all positions of one document',
-				routing: { request: { method: 'GET', url: '/api/belege/positionen' } },
+				routing: {
+					request: { method: 'GET', url: '/api/belege/positionen' },
+					output: { postReceive: [{ type: 'rootProperty', properties: { property: 'rows' } }] },
+				},
 			},
 			{
 				name: 'Get Reports',

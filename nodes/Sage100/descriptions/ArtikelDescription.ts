@@ -23,7 +23,10 @@ export const artikelOperations: INodeProperties[] = [
 				value: 'getAll',
 				action: 'Get many articles',
 				description: 'List articles with the filters of the article view',
-				routing: { request: { method: 'GET', url: '/api/artikel/list' } },
+				routing: {
+					request: { method: 'GET', url: '/api/artikel/list' },
+					output: { postReceive: [{ type: 'rootProperty', properties: { property: 'rows' } }] },
+				},
 			},
 			{
 				name: 'Get Variants',

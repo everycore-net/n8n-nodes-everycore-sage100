@@ -16,7 +16,10 @@ export const vorgangOperations: INodeProperties[] = [
 				value: 'getAll',
 				action: 'Get many transactions',
 				description: 'List sales transactions',
-				routing: { request: { method: 'GET', url: '/api/vorgaenge/list' } },
+				routing: {
+					request: { method: 'GET', url: '/api/vorgaenge/list' },
+					output: { postReceive: [{ type: 'rootProperty', properties: { property: 'rows' } }] },
+				},
 			},
 			{
 				name: 'Get',
@@ -30,7 +33,10 @@ export const vorgangOperations: INodeProperties[] = [
 				value: 'getPositions',
 				action: 'Get the positions of a transaction',
 				description: 'Read the positions of one transaction',
-				routing: { request: { method: 'GET', url: '/api/vorgaenge/positionen' } },
+				routing: {
+					request: { method: 'GET', url: '/api/vorgaenge/positionen' },
+					output: { postReceive: [{ type: 'rootProperty', properties: { property: 'rows' } }] },
+				},
 			},
 		],
 	},

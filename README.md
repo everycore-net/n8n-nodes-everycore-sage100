@@ -4,7 +4,7 @@ n8n community nodes for the [everycore](https://everycore.net) **Sage 100 Task S
 
 They let an n8n workflow read and write sales documents, transactions and articles in Sage 100 through the Task Service, instead of touching the Sage database or the Sage API directly.
 
-> **Status: 0.1.0, not yet released.** Lint, tests and build pass; nothing has been run against a live n8n yet — see [Before the first release](#before-the-first-release).
+> **Status: 0.1.0, not yet released.** Lint, tests and build pass, and the reading operations have been exercised against a live n8n and a live Task Service — see [Before the first release](#before-the-first-release) for what is still open.
 
 ## Nodes
 
@@ -104,15 +104,32 @@ npx @n8n/scan-community-package n8n-nodes-everycore-sage100
 
 `eslint.config.mjs` is compared byte for byte while `"strict": true` is set in the `n8n` section of `package.json`. Do not add comments to it.
 
+## What a list operation delivers
+
+Three shapes come back from the service, and each becomes something different in a workflow:
+
+| Service answers | Node delivers | Operations |
+|---|---|---|
+| `{rows: […], count, gesamt}` | one item per record | Get Many (all three resources), Get Positions |
+| `{rows: […], summeSoll, summeRest}` | **one item, envelope intact** | Get Bookings, Get Open Items |
+| a bare array | one item per record (n8n spreads it) | Search, Get Variants, Get Reports |
+
+The middle row is deliberate. Unwrapping those would drop `summeSoll`, `summeHaben` and `summeRest`, and for a bookings query the totals are half the answer. Where the envelope only carries paging counters, it goes.
+
+The service keeps its envelope for everyone — the Core web interface pages through `gesamt`/`seiten` — and the node adapts it. An API contract does not bend for one consumer.
+
 ## Before the first release
 
-Lint and build pass, but **nothing here has been exercised against a running n8n or a live Task Service**. Check these first:
+Checked on 10 September 2026 against n8n 2.35.5 and a live Task Service (Mandant 123) with `tools/live-n8n-check.mjs`: credential test, all three Get Many operations, Get Positions, Get Bookings, Get Open Items, Search and Get Reports — each delivering the shape above. The script creates its own API key, credential and workflow and removes all three afterwards.
+
+Still unproven, because none of it is read-only or observable from a script:
 
 - **Print → binary output.** The `binaryData` post-receive action is the least certain construct in the package.
 - **`rawBody` in the webhook trigger.** Signature verification depends on getting the body exactly as it was signed; re-serialised JSON will not match.
 - **Channel lifecycle.** Activate and deactivate a workflow and confirm the channel appears and disappears in *Settings → Communication*.
+- **The writing operations** — Create, Add/Update/Delete Position, Update Header — have not been run against a live Mandant.
 
-For n8n's verified registry the package additionally needs a **public** repository, publishing through **GitHub Actions with provenance** (mandatory since 1 May 2026), MIT licence, no runtime dependencies, and an English-only interface. The last three are already met; the `repository` field in `package.json` still points at Azure DevOps and must be changed when the repository moves.
+For n8n's verified registry the package needs a **public** repository, publishing through **GitHub Actions with provenance** (mandatory since 1 May 2026), MIT licence, no runtime dependencies, and an English-only interface. All of those are met.
 
 ## Icons
 
