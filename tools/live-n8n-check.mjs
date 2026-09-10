@@ -1,5 +1,5 @@
 /**
- * Runs the node inside a real n8n against a real Task Service, which is the only
+ * Runs the node inside a real n8n against a real Core installation, the only
  * place the declarative routing can be observed.
  *
  * What it is for: every list endpoint of the service answers in one of three
@@ -47,7 +47,7 @@ const coreCall = async (path, body, token) => {
 };
 
 const session = await coreCall('/api/auth/login', { User: CORE_USER, Password: CORE_PASS });
-if (session.status !== 200) throw new Error(`Task Service login failed: HTTP ${session.status}`);
+if (session.status !== 200) throw new Error(`Core login failed: HTTP ${session.status}`);
 const token = session.body.token;
 
 // The key is created through the action segment on purpose: a plain

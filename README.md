@@ -1,10 +1,10 @@
 # n8n-nodes-everycore-sage100
 
-n8n community nodes for the [everycore](https://everycore.net) **Sage 100 Task Service** REST API.
+n8n community nodes for **[everycore Core](https://everycore.net) for Sage 100**.
 
-They let an n8n workflow read and write sales documents, transactions and articles in Sage 100 through the Task Service, instead of touching the Sage database or the Sage API directly.
+They let an n8n workflow read and write sales documents, transactions and articles in Sage 100 through Core, instead of touching the Sage database or the Sage API directly.
 
-> **Status: 0.1.0, not yet released.** Lint, tests and build pass, and every operation of all three nodes has been run against a live n8n and a live Task Service — see [Before the first release](#before-the-first-release).
+> **Status: 0.1.0, published.** Every operation of all three nodes has been run against a live n8n and a live Core installation — see [What was verified](#what-was-verified).
 
 ## Nodes
 
@@ -26,7 +26,7 @@ They let an n8n workflow read and write sales documents, transactions and articl
 
 ## Credentials
 
-One credential, **Sage 100 Task Service API**, used by all three nodes.
+One credential, **Everycore Core (Sage 100) API**, used by all three nodes. (The brand is lowercase everywhere else; n8n's lint rules require a credential name in title case ending in “API”.)
 
 | Field | Notes |
 |---|---|
@@ -118,9 +118,9 @@ The middle row is deliberate. Unwrapping those would drop `summeSoll`, `summeHab
 
 The service keeps its envelope for everyone — the Core web interface pages through `gesamt`/`seiten` — and the node adapts it. An API contract does not bend for one consumer.
 
-## Before the first release
+## What was verified
 
-Checked on 10 September 2026 against n8n 2.35.5 and a live Task Service (Mandant 123) with `tools/live-n8n-check.mjs`: credential test, all three Get Many operations, Get Positions, Get Bookings, Get Open Items, Search and Get Reports — each delivering the shape above. The script creates its own API key, credential and workflow and removes all three afterwards.
+Checked on 10 September 2026 against n8n 2.35.5 and a live Core installation (Mandant 123) with `tools/live-n8n-check.mjs`: credential test, all three Get Many operations, Get Positions, Get Bookings, Get Open Items, Search and Get Reports — each delivering the shape above. The script creates its own API key, credential and workflow and removes all three afterwards.
 
 The writing operations were run against Mandant 123 on the same day, through two workflows on the working n8n: create a document, add a position, change the header, change a position, delete it, read the result — and print, which came back as a 162 kB PDF and set `gedruckt` on the document in Sage. Two answers do not contain what a workflow needs next, and both are now said in the operation's own description: **Create answers with `newBelId`**, not `belId`, and **Add Position answers with counts and totals but no `belPosId`**, so the position has to be read back before it can be changed or deleted.
 

@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-everycore-sage100",
   "version": "0.1.0",
-  "description": "n8n nodes for the everycore Sage 100 Task Service REST API: sales documents, transactions and articles",
+  "description": "n8n nodes for everycore Core for Sage 100: sales documents, transactions and articles",
   "keywords": [
     "n8n-community-node-package",
     "sage",
@@ -46,7 +46,7 @@
     "n8nNodesApiVersion": 1,
     "strict": true,
     "credentials": [
-      "dist/credentials/Sage100TaskServiceApi.credentials.js"
+      "dist/credentials/Sage100CoreApi.credentials.js"
     ],
     "nodes": [
       "dist/nodes/Sage100/Sage100.node.js",

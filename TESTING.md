@@ -1,102 +1,111 @@
 # Testing brief
 
-Hand-off for whoever verifies this package against a running n8n. Written after
-the package was authored on a machine with no n8n available.
+How to re-verify this package after a change. The first version of this file was
+a hand-off written before anything here had ever run; everything it listed as
+unknown has since been answered against a live n8n and a live everycore Core.
+What is left is the procedure, and the three constructs that are still worth
+re-checking whenever they are touched.
 
-## State at hand-off
+## What is automated and what is not
 
-Commit `0f62ea0` on `main`. `npm run lint` is clean and `npm run build`
-succeeds. **Nothing in this package has ever run against a live n8n or a live
-Sage 100 Task Service.** Everything below is therefore unverified behaviour, not
-regression testing.
+`npm run lint`, `npm test` and `npm run build` cover what can be checked without
+a server. The tests are unit tests over the poll trigger's watermark logic — the
+one piece of real logic in the package. Everything else is declarative routing,
+and declarative routing is only observable in a running n8n:
 
-Three nodes and one credential:
+| Check | Command | Needs |
+|---|---|---|
+| Lint, tests, build | `npm run lint && npm test && npm run build` | nothing |
+| Translations still cover every key | `npm run translations` | a build |
+| Response shapes through real routing | `node tools/live-n8n-check.mjs` | n8n + Core |
+| Writes, print, webhook | by hand, see below | n8n + Core, test Mandant |
 
-- `Sage100` — declarative action node (documents, transactions, articles)
-- `Sage100Trigger` — webhook receiver with HMAC verification and channel lifecycle
-- `Sage100PollTrigger` — polling trigger on new documents
-- `Sage100TaskServiceApi` — base URL, API key, dataset, SSL flag, webhook secret
+`tools/live-n8n-check.mjs` is the one worth running after any change to a
+description file. It creates its own API key, credential and workflow, drives
+every list operation through a webhook, checks each answer arrives in the
+contracted shape, and removes all three afterwards:
 
-## Before touching anything: find out
+```
+N8N_BASE=https://n8n.example.com N8N_USER=… N8N_PASS=… \
+CORE_BASE=http://localhost:12292 CORE_REACHABLE=http://10.0.0.5:12292 \
+CORE_USER=… CORE_PASS=… SAGE_DATASET="datenquelle;123" \
+node tools/live-n8n-check.mjs
+```
 
-Do not assume any of this — check it and write down what you found.
+`CORE_BASE` is how the script reaches Core, `CORE_REACHABLE` how n8n reaches it —
+they differ as soon as n8n runs in a container or on another machine.
 
-1. **How n8n runs here.** `docker ps`, then the compose file or `docker inspect`.
-   Which image tag, which n8n version, which volumes, is `~/.n8n` persisted.
-2. **Whether Node.js is on the host** and which version. The package needs
-   `>=20.15` to build.
-3. **Whether the container can reach the Task Service.** From inside the
-   container: `curl -sS -o /dev/null -w '%{http_code}' https://<sage-host>:8090/api/status`
-   with an `Authorization: Bearer <key>` header. If the service uses the
-   certificate shipped with Sage, expect a TLS failure until *Ignore SSL Issues*
-   is set in the credential.
-4. **Which API key exists** and which permissions it holds. Needs `View` at
-   minimum, `Run` for print, `EditBeleg` for writes, `EditStammdaten` for
-   articles, `Settings` if the trigger is to manage its own channel.
+## Installing the package into a running n8n
 
-## Installing the package into n8n
+Three routes, in order of how much they prove:
 
-The official docs move — check the current page rather than trusting a recipe
-from memory. As of writing, the usual routes are:
-
-- `npm run dev` (`n8n-node dev`) starts an n8n with the nodes loaded. Simplest
-  for a first look, and it sidesteps the container entirely.
-- A tarball from `npm pack`, installed into the community-node directory that
-  the running n8n reads, then restart the container.
+- `npm run dev` (`n8n-node dev`) starts an n8n with the nodes loaded. Fastest
+  loop, sidesteps the container, proves the least about a real install.
+- `npm pack`, then `npm install` the tarball inside the n8n container's
+  `~/.n8n/nodes` and restart it. This is what a customer install looks like.
 - Mounting the built package through the custom-extensions directory.
 
-Whichever route: after loading, the three nodes must appear in the node panel
-under their display names and the credential must appear in the credential list.
-If they do not, the `n8n` section of `package.json` and the `dist` paths are the
-first place to look.
+After loading, the three nodes must appear in the node panel under their display
+names and the credential must appear in the credential list. If they do not, the
+`n8n` section of `package.json` and the `dist` paths are the first place to look.
 
-## The three things most likely to be wrong
+Note for a German instance: n8n 2.35.5 cannot start with `N8N_DEFAULT_LOCALE=de`
+— `POST /rest/node-types` fails with ENOENT for every node including its own
+(reported upstream as #38263). The German translation files ship regardless and
+take effect once that is fixed.
 
-These are the constructs that could not be checked without a running n8n. Test
-them first; the rest of the package is ordinary declarative routing.
+## The three constructs to re-check when they are touched
+
+These are the parts that cannot fail at build time and cannot fail quietly
+either — each one either works or ruins a workflow.
 
 ### 1. Print returns binary
 
-`Sage 100` → resource *Sales Document* → operation *Print*, with a `belId` and a
-`berichtName` from *Get Reports*.
+*Sales Document* → *Print*, with a `belId` and a `berichtName` from *Get
+Reports*. Pass: the item carries binary data, the PDF opens, and `gedruckt` is
+set on the document in Sage. Fail modes: base64 text in the JSON instead of
+binary, a corrupted file, or the response being parsed as JSON and throwing.
 
-Pass: the item has binary data with a PDF in it, and the PDF opens. Fail modes to
-watch for: base64 text landing in the JSON instead of binary, a corrupted file,
-or the response being parsed as JSON and throwing.
-
-The suspect is `postReceive: [{ type: 'binaryData', ... }]` together with
-`encoding: 'arraybuffer', json: false` in `BelegDescription.ts`. If it does not
-work declaratively, the operation may have to move into a programmatic
-`execute`, which is a bigger change — say so rather than bodging it.
+The construct is `postReceive: [{ type: 'binaryData', … }]` together with
+`encoding: 'arraybuffer', json: false` in `BelegDescription.ts`. Verified
+working; a 162 kB PDF came back.
 
 ### 2. Webhook signature verification
 
-The signature is HMAC-SHA256 over `"<timestamp>.<body>"`, sent as
-`X-EVC-Signature: sha256=<hex>` with `X-EVC-Timestamp` in Unix seconds. The node
-reads `request.rawBody`.
+HMAC-SHA256 over `"<timestamp>.<body>"`, sent as `X-EVC-Signature: sha256=<hex>`
+with `X-EVC-Timestamp` in Unix seconds. The node reads `request.rawBody`.
 
-Pass: a genuine event from the service starts the workflow. Then deliberately
-break it — change one character of the secret in the credential and send again:
-that must be rejected, not accepted.
+**A valid signature being accepted proves nothing** — a node that accepts
+everything looks identical. Test the refusals, and keep the accepted request in
+the same run as a control, or a wrong URL will make every probe look like a
+rejection. The production URL is `/webhook/<webhookId>/webhook`: the node
+declares `path: 'webhook'`, so the path segment appears twice.
 
-If `rawBody` is empty or already parsed, verification will fail on every request.
-That is the thing to establish. Sending a hand-rolled request with `curl` is a
-fine way to test both paths; compute the signature the same way
-`CustomWebhookChannel.Signature` does in the Task Service repository.
+Also do not count executions to decide what got through. n8n records a refused
+delivery as an execution with status `error`, so the count is the same either
+way. The HTTP status is what distinguishes them: 500 refused, 200 accepted.
+
+Verified: no signature, wrong secret, valid signature over a different body, and
+a valid signature an hour old were all refused with 500; the current valid one
+was accepted with 200.
 
 ### 3. Channel lifecycle
 
 With *Manage Channel* on (default) and an API key holding `Settings`:
 
-- Activating the workflow must create a channel in the service under
-  *Settings → Communication*, type `Webhook`, `AuthMode=Hmac`, `WebhookUrl`
-  equal to the node's production URL.
-- Deactivating must remove it.
-- Re-activating after the URL changed must rewrite the URL rather than leave a
+- Activating the workflow creates a channel in Core under *Settings →
+  Communication*, type `Webhook`, `AuthMode=Hmac`, `WebhookUrl` equal to the
+  node's production URL.
+- Deactivating removes it.
+- Re-activating after the URL changed rewrites the URL rather than leaving a
   stale channel.
 
 The channel is named `n8n-<workflowId>-<nodeName>`. With *Manage Channel* off,
-none of the three should touch the service at all.
+none of the three may touch Core at all.
+
+Activating over the REST API needs `POST /rest/workflows/:id/activate` with the
+`versionId` in the body. A plain `PATCH` with `active: true` answers 200 and
+leaves the workflow inactive — which then reads as a broken channel lifecycle.
 
 ## Wider smoke test
 
@@ -113,8 +122,14 @@ Read-only first, on a test Mandant:
 **Writes create real data in Sage. Use a test Mandant, never a customer's
 production database.** Then:
 
-- *Create* with one position, *Update Header*, *Add / Update / Delete Position*
+- *Create* with one position, *Update Header*, *Add / Update / Delete Position*,
+  *Delete*
 - *Update* on an article
+
+Two answers do not carry what the next node needs, and both are documented in
+the operations themselves: *Create* answers with `newBelId`, not `belId`, and
+*Add Position* answers with counts and totals but no `belPosId`, so the position
+must be read back before it can be changed or deleted.
 
 Also worth checking: an empty *Dataset* in the credential against a key that is
 bound to a Mandant (must work), and a *Dataset* that contradicts a bound key
@@ -128,14 +143,22 @@ bound to a Mandant (must work), and a *Dataset* that contradicts a bound key
   build.
 - No runtime dependencies. Node built-ins are fine.
 - Interface text, parameter names and documentation in **English only** — n8n
-  rejects anything else for verification.
+  rejects anything else for verification. German lives in `translations/`.
+- **Reword an English description and the German has to be reworded by hand.**
+  `npm run translations` adds keys a node grew and drops ones it lost, but it
+  cannot see changed English under an unchanged key, so the German goes on
+  describing the old behaviour with nothing looking wrong.
 - Option and collection entries must be alphabetical by display name.
-- Light and dark icons must be different files.
+- Light and dark icons must be different files, and the icon path must use the
+  `file:` protocol — `fa:` icons are rejected for community nodes.
 - Parameter descriptions end with a period. `npm run lint:fix` handles that.
+- The credential type id is `sage100TaskServiceApi` and stays that way. It is
+  the old product name, it is invisible to users, and every stored credential
+  and saved workflow refers to it.
 
 ## Reporting back
 
-Useful: which of the three risk areas passed, exact error text for anything that
-failed, the n8n version tested against, and the install route that worked.
-Commit fixes with a message that says what was actually wrong rather than
-"fix lint" — the next person needs the reason.
+Useful: what was run, exact error text for anything that failed, the n8n version
+tested against, and the install route that worked. Commit fixes with a message
+that says what was actually wrong rather than "fix lint" — the next person needs
+the reason.

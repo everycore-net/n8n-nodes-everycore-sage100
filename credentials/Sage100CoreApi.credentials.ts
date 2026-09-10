@@ -6,7 +6,7 @@ import type {
 } from 'n8n-workflow';
 
 /**
- * Connection to one everycore Sage 100 Task Service installation.
+ * Connection to one everycore Core installation for Sage 100.
  *
  * Authentication is an API key issued in the service under
  * Settings -> API keys. A key is issued for an existing Sage user and can only
@@ -21,10 +21,16 @@ import type {
  * says who may call the service, the secret proves that an incoming webhook
  * really came from it. Only the trigger node uses it.
  */
-export class Sage100TaskServiceApi implements ICredentialType {
+export class Sage100CoreApi implements ICredentialType {
+	// The type id keeps the old name on purpose: it is what every stored
+	// credential and every saved workflow refers to. Renaming it would rename
+	// nothing a user sees and detach everything that already exists.
 	name = 'sage100TaskServiceApi';
 
-	displayName = 'Sage 100 Task Service API';
+	// The brand is written lowercase everywhere else, but n8n's lint rules
+	// require a credential display name in title case ending in "API", and
+	// eslint.config.mjs is compared byte for byte, so it cannot be silenced.
+	displayName = 'Everycore Core (Sage 100) API';
 
 	documentationUrl = 'https://everycore.net';
 
@@ -39,7 +45,7 @@ export class Sage100TaskServiceApi implements ICredentialType {
 			required: true,
 			placeholder: 'https://sage-server:8090',
 			description:
-				'Address of the Task Service, without a trailing slash. Use HTTPS: an API key is valid until revoked, so sending it over plain HTTP is a great deal worse than a short-lived browser session.',
+				'Address of the Core service, without a trailing slash. Use HTTPS: an API key is valid until revoked, so sending it over plain HTTP is a great deal worse than a short-lived browser session.',
 		},
 		{
 			displayName: 'API Key',

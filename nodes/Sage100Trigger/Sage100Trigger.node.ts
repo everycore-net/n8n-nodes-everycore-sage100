@@ -10,7 +10,7 @@ import type {
 } from 'n8n-workflow';
 
 /**
- * Receives events pushed by a webhook channel of the Task Service.
+ * Receives events pushed by a webhook channel of everycore Core.
  *
  * The service signs with HMAC-SHA256 over "<timestamp>.<body>" and sends
  * X-EVC-Timestamp (Unix seconds) plus X-EVC-Signature: sha256=<hex>. Both the
@@ -33,7 +33,7 @@ export class Sage100Trigger implements INodeType {
 		group: ['trigger'],
 		version: 1,
 		subtitle: '={{$parameter["events"]}}',
-		description: 'Starts a workflow when the Sage 100 Task Service sends an event',
+		description: 'Starts a workflow when everycore Core for Sage 100 sends an event',
 		defaults: {
 			name: 'Sage 100 Trigger',
 		},

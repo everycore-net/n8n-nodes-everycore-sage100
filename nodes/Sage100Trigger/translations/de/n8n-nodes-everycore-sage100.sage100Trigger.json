@@ -1,7 +1,7 @@
 {
   "header": {
     "displayName": "Sage 100 Trigger",
-    "description": "Startet einen Workflow, wenn der Sage 100 Task Service ein Ereignis sendet"
+    "description": "Startet einen Workflow, wenn everycore Core für Sage 100 ein Ereignis sendet"
   },
   "nodeView.manageChannel.displayName": "Kanal verwalten",
   "nodeView.manageChannel.description": "Ob der Webhook-Kanal im Dienst beim Aktivieren des Workflows angelegt und beim Deaktivieren wieder entfernt wird. Erfordert einen API-Schlüssel mit dem Recht Settings. Ausschalten, um einen von Hand eingerichteten Kanal zu verwenden.",

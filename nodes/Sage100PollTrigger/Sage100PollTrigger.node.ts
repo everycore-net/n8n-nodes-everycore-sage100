@@ -8,7 +8,7 @@ import type {
 } from 'n8n-workflow';
 
 /**
- * Polls the Task Service for new sales documents.
+ * Polls everycore Core for new sales documents.
  *
  * This is the fallback for installations where the service cannot reach n8n,
  * so the webhook trigger is not an option. Where it can, prefer

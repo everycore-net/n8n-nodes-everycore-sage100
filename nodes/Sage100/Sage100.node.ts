@@ -6,7 +6,7 @@ import { belegFields, belegOperations } from './descriptions/BelegDescription';
 import { vorgangFields, vorgangOperations } from './descriptions/VorgangDescription';
 
 /**
- * Action node for the everycore Sage 100 Task Service.
+ * Action node for everycore Core for Sage 100.
  *
  * Declarative style: every operation is a route, no custom transport code. The
  * service answers plain JSON and reports every error as { "error": "..." } with
